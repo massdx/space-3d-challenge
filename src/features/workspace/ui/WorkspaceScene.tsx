@@ -1,12 +1,12 @@
 import { ContactShadows, Environment, OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import type { DragEvent } from 'react'
-import { Raycaster, Vector2, Vector3 } from 'three'
+import { Raycaster, Vector2 } from 'three'
 import { CATALOG } from '../../catalog/model/catalog'
 import { DRAG_MIME, useCatalogStore } from '../../catalog/model/catalogStore'
+import { resolveDropPosition } from '../../catalog/model/dropTarget'
 import { PlacedFurniture } from '../../catalog/ui/PlacedFurniture'
 import { RoomShell } from '../../room/ui/RoomShell'
-import { FLOOR_Y, clampFloor, floorPlane } from '../model/floor'
 import { useViewportStore, type OrbitLike } from '../model/viewportStore'
 import { useWorkspaceStore } from '../model/workspaceStore'
 
@@ -39,10 +39,10 @@ export function WorkspaceScene() {
         )
         raycaster.setFromCamera(pointer, camera)
 
-        const hit = raycaster.ray.intersectPlane(floorPlane, new Vector3())
-        if (!hit) return
+        const position = resolveDropPosition(raycaster)
+        if (!position) return
 
-        place(modelId, [clampFloor(hit.x), FLOOR_Y, clampFloor(hit.z)])
+        place(modelId, position)
     }
 
     return (
@@ -58,6 +58,7 @@ export function WorkspaceScene() {
             }}
             onPointerMissed={() => select(null)}
             onDragOver={(event) => event.preventDefault()}
+            onContextMenu={(event) => event.preventDefault()}
             onDrop={onDrop}
         >
             <Environment preset="studio" />
