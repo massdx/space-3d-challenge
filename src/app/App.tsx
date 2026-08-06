@@ -1,7 +1,9 @@
 import { CatalogPanel } from '../features/catalog/ui/CatalogPanel'
+import { WallEditor } from '../features/workspace/ui/WallEditor'
 import { WorkspaceControls } from '../features/workspace/ui/WorkspaceControls'
 import { WorkspaceHeader } from '../features/workspace/ui/WorkspaceHeader'
 import { WorkspaceScene } from '../features/workspace/ui/WorkspaceScene'
+import { WorkspaceSettings } from '../features/workspace/ui/WorkspaceSettings'
 
 export function App() {
     return (
@@ -15,6 +17,8 @@ export function App() {
             <WorkspaceHeader />
             <WorkspaceScene />
             <CatalogPanel />
+            <WorkspaceSettings />
+            <WallEditor />
             <WorkspaceControls />
         </main>
     )
