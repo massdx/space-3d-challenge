@@ -2,11 +2,12 @@ import { ContactShadows, Environment, OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import type { DragEvent } from 'react'
 import { Raycaster, Vector2 } from 'three'
-import { CATALOG } from '../../catalog/model/catalog'
+import { CATALOG, CATALOG_BY_ID } from '../../catalog/model/catalog'
 import { DRAG_MIME, useCatalogStore } from '../../catalog/model/catalogStore'
 import { resolveDropPosition } from '../../catalog/model/dropTarget'
 import { PlacedFurniture } from '../../catalog/ui/PlacedFurniture'
 import { RoomShell } from '../../room/ui/RoomShell'
+import { clampToRoom } from '../model/floor'
 import { useViewportStore, type OrbitLike } from '../model/viewportStore'
 import { useWorkspaceStore } from '../model/workspaceStore'
 
@@ -23,6 +24,7 @@ export function WorkspaceScene() {
 
     const place = useCatalogStore((state) => state.place)
     const select = useCatalogStore((state) => state.select)
+    const selectWall = useWorkspaceStore((state) => state.selectWall)
 
     const onDrop = (event: DragEvent<HTMLDivElement>) => {
         event.preventDefault()
@@ -42,7 +44,9 @@ export function WorkspaceScene() {
         const position = resolveDropPosition(raycaster)
         if (!position) return
 
-        place(modelId, position)
+        const radius = (CATALOG_BY_ID[modelId].targetSize) / 2
+        const [x, z] = clampToRoom(position[0], position[2], radius)
+        place(modelId, [x, position[1], z])
     }
 
     return (
@@ -56,32 +60,36 @@ export function WorkspaceScene() {
                 setRenderer(gl)
                 setCamera(camera)
             }}
-            onPointerMissed={() => select(null)}
+            onPointerMissed={() => {
+                select(null)
+                selectWall(null)
+            }}
             onDragOver={(event) => event.preventDefault()}
             onContextMenu={(event) => event.preventDefault()}
             onDrop={onDrop}
         >
-            <Environment preset="studio" />
+            <Environment preset="apartment" environmentIntensity={isNight ? 0.52 : 0.90} />
 
-            <ambientLight intensity={isNight ? 0.62 : 0.78} />
-            <hemisphereLight args={['#f5f7fa', '#d9dde3', 0.35]} />
+            <ambientLight intensity={isNight ? 0.1 : 0.18} color="#ffe6cc" />
+            <hemisphereLight args={['#ffe9d2', '#2b2824', 0.22]} />
             <directionalLight
                 castShadow
-                intensity={isNight ? 1.1 : 1.4}
-                position={[9, 11, 8]}
+                intensity={isNight ? 0.18 : 0.4}
+                position={[20, 50, 6]}
+                color="#ffe4c0"
                 shadow-mapSize-width={2048}
                 shadow-mapSize-height={2048}
                 shadow-bias={-0.0001}
             />
             <spotLight
                 castShadow
-                position={[0.2, 7.5, 0.2]}
-                angle={0.62}
-                penumbra={0.5}
-                intensity={isNight ? 15 : 12}
-                distance={24}
-                decay={1.6}
-                color="#fff7ed"
+                position={[1.4, 6.2, 1.4]}
+                angle={0.7}
+                penumbra={0.85}
+                intensity={isNight ? 24 : 17}
+                distance={22}
+                decay={1.7}
+                color="#ffd39a"
                 target-position={[0, 0, 0]}
             />
 

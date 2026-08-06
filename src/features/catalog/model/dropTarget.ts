@@ -1,5 +1,5 @@
 import { Raycaster, Vector3 } from 'three'
-import { clampFloor, floorPlane } from '../../workspace/model/floor'
+import { floorPlane } from '../../workspace/model/floor'
 import { getPlacedObjects } from './placedRegistry'
 
 const floorScratch = new Vector3()
@@ -27,5 +27,5 @@ export function resolveDropPosition(
     }
 
     if (!point) return null
-    return [clampFloor(point.x), point.y, clampFloor(point.z)]
+    return [point.x, point.y, point.z]
 }

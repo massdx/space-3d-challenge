@@ -1,6 +1,7 @@
 import type { ThreeEvent } from '@react-three/fiber'
 import { Suspense, useEffect, useRef } from 'react'
 import { Raycaster } from 'three'
+import { clampToRoom } from '../../workspace/model/floor'
 import { useViewportStore } from '../../workspace/model/viewportStore'
 import { CATALOG_BY_ID } from '../model/catalog'
 import { useCatalogStore } from '../model/catalogStore'
@@ -89,7 +90,9 @@ export function PlacedFurniture() {
                     const next = resolveDropPosition(dragRaycaster, item.id)
                     if (next) {
                         const [offsetX, offsetZ] = grabOffset.current
-                        moveTo(item.id, [next[0] + offsetX, next[1], next[2] + offsetZ])
+                        const radius = (model.targetSize * item.scale) / 2
+                        const [x, z] = clampToRoom(next[0] + offsetX, next[2] + offsetZ, radius)
+                        moveTo(item.id, [x, next[1], z])
                     }
                 }
 
