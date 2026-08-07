@@ -8,6 +8,7 @@ import { resolveDropPosition } from '../../catalog/model/dropTarget'
 import { PlacedFurniture } from '../../catalog/ui/PlacedFurniture'
 import { RoomShell } from '../../room/ui/RoomShell'
 import { clampToRoom } from '../model/floor'
+import { useToolWheelStore } from '../model/toolWheelStore'
 import { useViewportStore, type OrbitLike } from '../model/viewportStore'
 import { useWorkspaceStore } from '../model/workspaceStore'
 
@@ -24,7 +25,8 @@ export function WorkspaceScene() {
 
     const place = useCatalogStore((state) => state.place)
     const select = useCatalogStore((state) => state.select)
-    const selectWall = useWorkspaceStore((state) => state.selectWall)
+    const selectSurface = useWorkspaceStore((state) => state.selectSurface)
+    const closeWheel = useToolWheelStore((state) => state.close)
 
     const onDrop = (event: DragEvent<HTMLDivElement>) => {
         event.preventDefault()
@@ -63,7 +65,8 @@ export function WorkspaceScene() {
             }}
             onPointerMissed={() => {
                 select(null)
-                selectWall(null)
+                selectSurface(null)
+                closeWheel()
             }}
             onDragOver={(event) => event.preventDefault()}
             onContextMenu={(event) => event.preventDefault()}

@@ -1,11 +1,16 @@
+import { bind } from 'cuelume'
+import { useEffect } from 'react'
 import { DragPreview, ThumbnailCanvas } from '../features/catalog/ui/CatalogThumbnail'
-import { WallEditor } from '../features/workspace/components/WallEditor'
+import { ToolWheel } from '../features/workspace/components/ToolWheel'
 import { WorkspaceControls } from '../features/workspace/components/WorkspaceControls'
 import { WorkspaceHeader } from '../features/workspace/components/WorkspaceHeader'
 import { WorkspaceScene } from '../features/workspace/components/WorkspaceScene'
-import { WorkspaceSettings } from '../features/workspace/components/WorkspaceSettings'
 
 export function App() {
+    useEffect(() => {
+        bind()
+    }, [])
+
     return (
         <main
             className="relative h-screen bg-white w-screen overflow-hidden text-slate-100"
@@ -16,11 +21,10 @@ export function App() {
         >
             <WorkspaceHeader />
             <WorkspaceScene />
-            <WorkspaceSettings />
-            <WallEditor />
             <WorkspaceControls />
             <ThumbnailCanvas />
             <DragPreview />
+            <ToolWheel />
         </main>
     )
 }

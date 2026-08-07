@@ -4,17 +4,17 @@ export type WindowSide = 'none' | 'left' | 'right'
 
 export type WallId = 'left' | 'right'
 
-export type TextureId = 'none' | 'stripes' | 'dots' | 'grid' | 'checker' | 'brick'
+export type SurfaceId = WallId | 'floor'
 
 export type WorkspaceState = {
     environmentPreset: EnvironmentPreset
     toggleEnvironment: () => void
     windowSide: WindowSide
     setWindowSide: (side: WindowSide) => void
-    wallColors: Record<WallId, string | null>
-    wallTextures: Record<WallId, TextureId>
-    selectedWall: WallId | null
-    selectWall: (wall: WallId | null) => void
-    setWallColor: (wall: WallId, color: string) => void
-    setWallTexture: (wall: WallId, texture: TextureId) => void
+    surfaceColors: Record<SurfaceId, string | null>
+    surfaceTextures: Record<SurfaceId, string | null>
+    selectedSurface: SurfaceId | null
+    selectSurface: (surface: SurfaceId | null) => void
+    setSurfaceColor: (surface: SurfaceId, color: string) => void
+    setSurfaceTexture: (surface: SurfaceId, texture: string | null) => void
 }

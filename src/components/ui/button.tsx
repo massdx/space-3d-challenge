@@ -3,7 +3,7 @@
 import { forwardRef, type ButtonHTMLAttributes } from 'react'
 
 type ButtonVariant = 'solid' | 'primary' | 'outline' | 'ghost'
-type ButtonSize = 'sm' | 'md' | 'lg'| 'xl'
+type ButtonSize = 'sm' | 'md' | 'lg' | 'xl'
 type ButtonShape = 'pill' | 'circle'
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -48,11 +48,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
 ) {
     return (
         <button
-        style={{
-            // boxShadow: 'inset -1px -1px 1.4px rgba(72, 72, 72, 0.25)',
-        }}
+            style={{
+                // boxShadow: 'inset -1px -1px 1.4px rgba(72, 72, 72, 0.25)',
+            }}
             ref={ref}
             type={type}
+            data-cuelume-press
             className={cn(base, variants[variant], sizes[shape][size], className)}
             {...props}
         >

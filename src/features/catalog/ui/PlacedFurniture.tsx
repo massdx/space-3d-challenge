@@ -1,7 +1,9 @@
 import type { ThreeEvent } from '@react-three/fiber'
+import { play } from 'cuelume'
 import { Suspense, useEffect, useRef } from 'react'
 import { Raycaster } from 'three'
 import { clampToRoom } from '../../workspace/model/floor'
+import { useToolWheelStore } from '../../workspace/model/toolWheelStore'
 import { useViewportStore } from '../../workspace/model/viewportStore'
 import { CATALOG_BY_ID } from '../model/catalog'
 import { useCatalogStore } from '../model/catalogStore'
@@ -12,6 +14,8 @@ import { FurnitureModel } from './FurnitureModel'
 const dragRaycaster = new Raycaster()
 const ROTATE_SPEED = 0.01
 const SCALE_SPEED = 0.005
+const LONG_PRESS_MS = 350
+const MOVE_CANCEL_PX = 8
 
 export function PlacedFurniture() {
     const items = useCatalogStore((state) => state.items)
@@ -20,12 +24,23 @@ export function PlacedFurniture() {
     const moveTo = useCatalogStore((state) => state.moveTo)
     const rotateBy = useCatalogStore((state) => state.rotateBy)
     const scaleBy = useCatalogStore((state) => state.scaleBy)
+    const openWheel = useToolWheelStore((state) => state.openAt)
 
     const draggingId = useRef<string | null>(null)
     const transformId = useRef<string | null>(null)
     const lastX = useRef(0)
     const grabOffset = useRef<[number, number]>([0, 0])
     const activeKey = useRef<'r' | 's' | null>(null)
+    const pressTimer = useRef<number | null>(null)
+    const pressStart = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
+    const lockedErrored = useRef(false)
+
+    const clearPress = () => {
+        if (pressTimer.current !== null) {
+            clearTimeout(pressTimer.current)
+            pressTimer.current = null
+        }
+    }
 
     useEffect(() => {
         const onKeyDown = (event: KeyboardEvent) => {
@@ -59,8 +74,30 @@ export function PlacedFurniture() {
                 const onPointerDown = (event: ThreeEvent<PointerEvent>) => {
                     event.stopPropagation()
                     select(item.id)
-                        ; (event.target as Element).setPointerCapture(event.pointerId)
+                    const el = event.target as Element
+                    el.setPointerCapture(event.pointerId)
                     setOrbitEnabled(false)
+
+                    pressStart.current = { x: event.nativeEvent.clientX, y: event.nativeEvent.clientY }
+                    lockedErrored.current = false
+                    clearPress()
+                    pressTimer.current = window.setTimeout(() => {
+                        pressTimer.current = null
+                        draggingId.current = null
+                        transformId.current = null
+                        try {
+                            el.releasePointerCapture(event.pointerId)
+                        } catch {
+                            // capture peut déjà être relâchée
+                        }
+                        setOrbitEnabled(true)
+                        openWheel(pressStart.current.x, pressStart.current.y, {
+                            kind: 'furniture',
+                            id: item.id,
+                        })
+                    }, LONG_PRESS_MS)
+
+                    if (item.locked) return
                     if (activeKey.current) {
                         transformId.current = item.id
                         lastX.current = event.nativeEvent.clientX
@@ -75,6 +112,20 @@ export function PlacedFurniture() {
                 }
 
                 const onPointerMove = (event: ThreeEvent<PointerEvent>) => {
+                    if (pressTimer.current !== null) {
+                        const dx = event.nativeEvent.clientX - pressStart.current.x
+                        const dy = event.nativeEvent.clientY - pressStart.current.y
+                        if (Math.hypot(dx, dy) > MOVE_CANCEL_PX) clearPress()
+                    }
+                    if (item.locked) {
+                        const dx = event.nativeEvent.clientX - pressStart.current.x
+                        const dy = event.nativeEvent.clientY - pressStart.current.y
+                        if (Math.hypot(dx, dy) > MOVE_CANCEL_PX && !lockedErrored.current) {
+                            lockedErrored.current = true
+                            play('error')
+                        }
+                        return
+                    }
                     if (transformId.current === item.id) {
                         event.stopPropagation()
                         const x = event.nativeEvent.clientX
@@ -97,6 +148,7 @@ export function PlacedFurniture() {
                 }
 
                 const onPointerUp = (event: ThreeEvent<PointerEvent>) => {
+                    clearPress()
                     if (transformId.current === item.id) {
                         transformId.current = null
                             ; (event.target as Element).releasePointerCapture(event.pointerId)
@@ -124,10 +176,14 @@ export function PlacedFurniture() {
                             <FurnitureModel url={model.url} targetSize={model.targetSize} />
                         </Suspense>
 
-                        {selectedId === item.id && (
+                        {(selectedId === item.id || item.locked) && (
                             <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
                                 <ringGeometry args={[model.targetSize * 0.55, model.targetSize * 0.62, 48]} />
-                                <meshBasicMaterial color="#22d3ee" transparent opacity={0.9} />
+                                <meshBasicMaterial
+                                    color={item.locked ? '#f59e0b' : '#22d3ee'}
+                                    transparent
+                                    opacity={0.9}
+                                />
                             </mesh>
                         )}
                     </group>

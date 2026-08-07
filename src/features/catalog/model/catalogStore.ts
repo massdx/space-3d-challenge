@@ -1,4 +1,7 @@
+import { play } from 'cuelume'
 import { create } from 'zustand'
+import { clampToRoom } from '../../workspace/model/floor'
+import { CATALOG_BY_ID } from './catalog'
 
 export type PlacedItem = {
     id: string
@@ -6,6 +9,7 @@ export type PlacedItem = {
     position: [number, number, number]
     rotationY: number
     scale: number
+    locked: boolean
 }
 
 type CatalogState = {
@@ -19,6 +23,9 @@ type CatalogState = {
     moveTo: (id: string, position: [number, number, number]) => void
     rotateBy: (id: string, delta: number) => void
     scaleBy: (id: string, factor: number) => void
+    toggleLock: (id: string) => void
+    duplicate: (id: string) => void
+    resetTransform: (id: string) => void
     remove: (id: string) => void
     select: (id: string | null) => void
     clear: () => void
@@ -39,8 +46,9 @@ export const useCatalogStore = create<CatalogState>((set) => ({
     place: (modelId, position) =>
         set((state) => {
             const id = `${modelId}-${++counter}`
+            play('success')
             return {
-                items: [...state.items, { id, modelId, position, rotationY: 0, scale: 1 }],
+                items: [...state.items, { id, modelId, position, rotationY: 0, scale: 1, locked: false }],
                 selectedId: id,
             }
         }),
@@ -62,12 +70,44 @@ export const useCatalogStore = create<CatalogState>((set) => ({
                     : item,
             ),
         })),
+    toggleLock: (id) =>
+        set((state) => ({
+            items: state.items.map((item) =>
+                item.id === id ? { ...item, locked: !item.locked } : item,
+            ),
+        })),
+    duplicate: (id) =>
+        set((state) => {
+            const source = state.items.find((item) => item.id === id)
+            if (!source) return state
+            const model = CATALOG_BY_ID[source.modelId]
+            const radius = model ? (model.targetSize * source.scale) / 2 : 0
+            const [x, z] = clampToRoom(source.position[0] + 0.6, source.position[2] + 0.6, radius)
+            const newId = `${source.modelId}-${++counter}`
+            return {
+                items: [
+                    ...state.items,
+                    { ...source, id: newId, position: [x, source.position[1], z], locked: false },
+                ],
+                selectedId: newId,
+            }
+        }),
+    resetTransform: (id) =>
+        set((state) => ({
+            items: state.items.map((item) =>
+                item.id === id ? { ...item, rotationY: 0, scale: 1 } : item,
+            ),
+        })),
     remove: (id) =>
         set((state) => ({
             items: state.items.filter((item) => item.id !== id),
             selectedId: state.selectedId === id ? null : state.selectedId,
         })),
-    select: (id) => set({ selectedId: id }),
+    select: (id) =>
+        set((state) => {
+            if (id && id !== state.selectedId) play('ready')
+            return { selectedId: id }
+        }),
     clear: () => set({ items: [], selectedId: null }),
 }))
 

@@ -7,10 +7,15 @@ import {
     FullScreenIcon
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
+import { AnimatePresence, motion } from 'motion/react'
 import Button from '../../../components/ui/button'
 import { useCatalogStore } from '../../catalog/model/catalogStore'
 import { CatalogPopover } from '../../catalog/ui/CatalogPanel'
 import { useViewportStore } from '../model/viewportStore'
+import { useWorkspaceStore } from '../model/workspaceStore'
+import { TexturePopover } from './TexturePopover'
+
+const EASE_OUT = [0.23, 1, 0.32, 1] as const
 
 const BACKGROUND_COLORS = [
     '#111111',
@@ -32,6 +37,10 @@ export function WorkspaceControls() {
 
     const selectedId = useCatalogStore((state) => state.selectedId)
     const remove = useCatalogStore((state) => state.remove)
+
+    const selectedSurface = useWorkspaceStore((state) => state.selectedSurface)
+    const selectSurface = useWorkspaceStore((state) => state.selectSurface)
+    const setSurfaceColor = useWorkspaceStore((state) => state.setSurfaceColor)
 
     return (
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex items-end justify-between gap-4 p-4 sm:p-6">
@@ -70,7 +79,7 @@ export function WorkspaceControls() {
 
             </div>
 
-            <div className="pointer-events-auto space-x-3">
+            <div className="pointer-events-auto absolute p-4 sm:p-6 bottom-0 right-0 left-0 mx-auto translate-x-1/2 space-x-3">
                 <Button >
                     <HugeiconsIcon icon={ArrowTurnBackwardIcon} size={20} strokeWidth={1.8} />
                 </Button>
@@ -81,32 +90,45 @@ export function WorkspaceControls() {
             </div>
 
             <div className="pointer-events-auto flex flex-col items-end gap-2">
+                <AnimatePresence>
+                    {selectedSurface && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 8, filter: 'blur(4px)' }}
+                            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                            exit={{ opacity: 0, y: 8, filter: 'blur(4px)' }}
+                            transition={{ duration: 0.2, ease: EASE_OUT }}
+                            className="flex flex-col items-end gap-2"
+                        >
+                            <TexturePopover>
+                                <Button className='translate-y-4' shape='circle' size='xl'>
+                                    <HugeiconsIcon icon={BackgroundIcon} size={25} strokeWidth={1.8} />
+                                </Button>
+                            </TexturePopover>
 
+                            <div className="space-x-6 flex justify-end items-end ">
+                                <div className="grid grid-cols-5 gap-2">
+                                    {BACKGROUND_COLORS.map((color, index) => (
+                                        <Button
+                                            key={index}
+                                            shape="circle"
+                                            size="sm"
+                                            className="border-white/40"
+                                            style={{ background: color }}
+                                            onClick={() =>
+                                                color.startsWith('#') &&
+                                                setSurfaceColor(selectedSurface, color)
+                                            }
+                                        />
+                                    ))}
+                                </div>
+                                <Button shape='circle' size='lg' className='mr-2 ' onClick={() => selectSurface(null)} >
+                                    <HugeiconsIcon icon={Cancel01Icon} size={20} strokeWidth={1.8} />
+                                </Button>
 
-                <CatalogPopover>
-                    <Button className='translate-y-4' shape='circle' size='xl' onClick={() => zoomBy(1.18)} >
-                        <HugeiconsIcon icon={BackgroundIcon} size={25} strokeWidth={1.8} />
-                    </Button>
-                </CatalogPopover>
-
-                <div className="space-x-6 flex justify-end items-end ">
-                    <div className="grid grid-cols-5 gap-2">
-                        {BACKGROUND_COLORS.map((color, index) => (
-                            <Button
-                                key={index}
-                                shape="circle"
-                                size="sm"
-                                className="border-white/40"
-                                style={{ background: color }}
-                                onClick={() => zoomBy(0.85)}
-                            />
-                        ))}
-                    </div>
-                    <Button shape='circle' size='lg' className='mr-2 ' onClick={() => zoomBy(1.18)} >
-                        <HugeiconsIcon icon={Cancel01Icon} size={20} strokeWidth={1.8} />
-                    </Button>
-
-                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
 
                 {selectedId && <Button className={"absolute right-0 -translate-y-20"} disabled={!selectedId}>
