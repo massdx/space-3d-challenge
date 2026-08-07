@@ -14,13 +14,13 @@ const EASE_OUT = [0.23, 1, 0.32, 1] as const
 const EMPTY_DRAG_IMAGE =
     typeof Image !== 'undefined'
         ? Object.assign(new Image(), {
-              src: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
-          })
+            src: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
+        })
         : undefined
 
 export function CatalogPopover({ children }: { children: ReactNode }) {
     const [isOpen, setIsOpen] = useState(false)
-    const [tab, setTab] = useState<Tab>('store')
+    const [tab] = useState<Tab>('store')
     const gridRef = useRef<HTMLDivElement | null>(null)
 
     useEffect(() => {
@@ -81,29 +81,6 @@ export function CatalogPopover({ children }: { children: ReactNode }) {
                 </motion.div>
             </PopoverContent>
         </Popover>
-    )
-}
-
-function TabButton({
-    active,
-    onClick,
-    children,
-}: {
-    active: boolean
-    onClick: () => void
-    children: React.ReactNode
-}) {
-    return (
-        <button
-            type="button"
-            onClick={onClick}
-            className={[
-                'flex-1 rounded-full px-3 py-1.5 font-medium transition',
-                active ? 'bg-white text-slate-900 shadow' : 'text-slate-500 hover:text-slate-700',
-            ].join(' ')}
-        >
-            {children}
-        </button>
     )
 }
 

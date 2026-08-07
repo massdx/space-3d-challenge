@@ -11,7 +11,6 @@ import Button from '../../../components/ui/button'
 import { useCatalogStore } from '../../catalog/model/catalogStore'
 import { CatalogPopover } from '../../catalog/ui/CatalogPanel'
 import { useViewportStore } from '../model/viewportStore'
-import { useWorkspaceStore } from '../model/workspaceStore'
 
 const BACKGROUND_COLORS = [
     '#111111',
@@ -27,10 +26,6 @@ const BACKGROUND_COLORS = [
 ]
 
 export function WorkspaceControls() {
-    const environmentPreset = useWorkspaceStore((state) => state.environmentPreset)
-    const toggleEnvironment = useWorkspaceStore((state) => state.toggleEnvironment)
-    const isNight = environmentPreset === 'night'
-
     const zoomBy = useViewportStore((state) => state.zoomBy)
     const resetCamera = useViewportStore((state) => state.resetCamera)
 

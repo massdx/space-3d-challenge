@@ -1,14 +1,13 @@
-import { HugeiconsIcon } from '@hugeicons/react'
 import { Camera01Icon, HelpCircleIcon, LinkBackwardIcon, Settings01Icon, Sun02Icon } from '@hugeicons/core-free-icons'
-import Button from '../../../components/ui/button'
-import { useWorkspaceStore } from '../model/workspaceStore'
+import { HugeiconsIcon } from '@hugeicons/react'
 import { useState } from 'react'
+import Button from '../../../components/ui/button'
 import { useViewportStore } from '../model/viewportStore'
+import { useWorkspaceStore } from '../model/workspaceStore'
 
 export function WorkspaceHeader() {
-    const environmentPreset = useWorkspaceStore((state) => state.environmentPreset)
     const toggleEnvironment = useWorkspaceStore((state) => state.toggleEnvironment)
-    const [open, setOpen] = useState(false)
+    const [, setOpen] = useState(false)
     const screenshot = useViewportStore((state) => state.screenshot)
     return (
         <div className="absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-4 p-4 sm:p-6">

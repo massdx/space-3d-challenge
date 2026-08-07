@@ -1,9 +1,6 @@
-import { Settings01Icon } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { useState } from 'react'
-import type { WindowSide } from '../model/types'
-import { useWorkspaceStore } from '../model/workspaceStore'
-import Button from '../../../components/ui/button'
+import { useState } from 'react';
+import type { WindowSide } from '../model/types';
+import { useWorkspaceStore } from '../model/workspaceStore';
 
 const WINDOW_OPTIONS: { value: WindowSide; label: string }[] = [
     { value: 'none', label: 'Aucune' },
@@ -12,13 +9,13 @@ const WINDOW_OPTIONS: { value: WindowSide; label: string }[] = [
 ]
 
 export function WorkspaceSettings() {
-    const [open, setOpen] = useState(false)
+    const [open] = useState(false)
     const windowSide = useWorkspaceStore((state) => state.windowSide)
     const setWindowSide = useWorkspaceStore((state) => state.setWindowSide)
 
     return (
         <div className="absolute right-4 top-24 z-20 flex flex-col items-end gap-2 sm:right-6">
-        
+
             {/* <Button onClick={() => setOpen((value) => !value)}>
                 <HugeiconsIcon icon={Settings01Icon} size={20} strokeWidth={1.8} />
             </Button> */}
