@@ -53,8 +53,9 @@ export function WorkspaceScene() {
         <Canvas
             camera={{ position: [11, 8.2, 11], fov: 34 }}
             shadows
-            dpr={[1, 1.5]}
-            gl={{ alpha: true, preserveDrawingBuffer: true }}
+            dpr={[1, 1.25]}
+            frameloop="demand"
+            gl={{ alpha: true }}
             style={{ background: 'transparent' }}
             onCreated={({ gl, camera }) => {
                 setRenderer(gl)
@@ -77,12 +78,11 @@ export function WorkspaceScene() {
                 intensity={isNight ? 0.18 : 0.4}
                 position={[20, 50, 6]}
                 color="#ffe4c0"
-                shadow-mapSize-width={2048}
-                shadow-mapSize-height={2048}
+                shadow-mapSize-width={1024}
+                shadow-mapSize-height={1024}
                 shadow-bias={-0.0001}
             />
             <spotLight
-                castShadow
                 position={[1.4, 6.2, 1.4]}
                 angle={0.7}
                 penumbra={0.85}
@@ -103,7 +103,7 @@ export function WorkspaceScene() {
                 far={4}
                 blur={3.5}
                 opacity={0.22}
-                resolution={1024}
+                resolution={512}
                 color="#8a8f99"
             />
 

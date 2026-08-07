@@ -30,7 +30,7 @@ export function FurnitureModel({ url, targetSize }: FurnitureModelProps) {
         object.traverse((child) => {
             if (child instanceof Mesh) {
                 child.castShadow = true
-                child.receiveShadow = true
+                child.receiveShadow = false
             }
         })
     }, [object])
