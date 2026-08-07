@@ -6,6 +6,7 @@ import {
     TEXTURE_OPTIONS,
 } from '../model/wallTextures'
 import { useWorkspaceStore } from '../model/workspaceStore'
+import Button from '../../../components/ui/button'
 
 const WALL_COLORS = [
     '#111827',
@@ -42,15 +43,9 @@ export function WallEditor() {
         <div className="pointer-events-auto absolute right-4 top-1/2 z-30 w-60 -translate-y-1/2 rounded-2xl border border-white/10 bg-slate-950/80 p-4 shadow-2xl backdrop-blur sm:right-6">
             <div className="flex items-center justify-between">
                 <p className="text-sm font-medium text-white">{WALL_LABEL[selectedWall]}</p>
-                <button
-                    type="button"
-                    onClick={() => selectWall(null)}
-                    aria-label="Fermer"
-                    title="Fermer"
-                    className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-slate-900/60 text-slate-300 transition hover:bg-slate-800/70 hover:text-white"
-                >
+                <Button onClick={() => selectWall(null)}>
                     <HugeiconsIcon icon={Cancel01Icon} size={16} strokeWidth={1.8} />
-                </button>
+                </Button>
             </div>
 
             <p className="mt-3 text-xs uppercase tracking-[0.3em] text-cyan-300">Couleur</p>

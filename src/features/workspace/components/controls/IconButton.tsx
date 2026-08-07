@@ -1,19 +1,20 @@
 import { HugeiconsIcon } from '@hugeicons/react'
-import type { ComponentProps } from 'react'
+import { forwardRef, type ButtonHTMLAttributes, type ComponentProps } from 'react'
 
-type IconButtonProps = {
+type IconButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'title'> & {
     icon: ComponentProps<typeof HugeiconsIcon>['icon']
     label: string
-    onClick?: () => void
     active?: boolean
-    disabled?: boolean
 }
 
-export function IconButton({ icon, label, onClick, active, disabled }: IconButtonProps) {
+export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(function IconButton(
+    { icon, label, active, disabled, className, ...props },
+    ref,
+) {
     return (
         <button
+            ref={ref}
             type="button"
-            onClick={onClick}
             disabled={disabled}
             aria-label={label}
             title={label}
@@ -23,9 +24,11 @@ export function IconButton({ icon, label, onClick, active, disabled }: IconButto
                 active
                     ? 'border-cyan-400/60 bg-cyan-300/20 text-cyan-100'
                     : 'border-white/10 bg-slate-950/60 text-slate-200 hover:bg-slate-800/70 hover:text-white',
+                className ?? '',
             ].join(' ')}
+            {...props}
         >
             <HugeiconsIcon icon={icon} size={20} strokeWidth={1.8} />
         </button>
     )
-}
+})

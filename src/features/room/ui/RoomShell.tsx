@@ -45,7 +45,7 @@ function Floor({ night }: { night: boolean }) {
         <RoundedBox
             args={[ROOM_SIZE, 0.5, ROOM_SIZE]}
             radius={0.05}
-            smoothness={6}
+            smoothness={2}
             position={[0, 0, 0]}
             receiveShadow
         >
@@ -93,7 +93,7 @@ function Walls({
                 <RoundedBox
                     args={[WALL_THICKNESS, WALL_HEIGHT, ROOM_SIZE]}
                     radius={0.05}
-                    smoothness={6}
+                    smoothness={2}
                     position={[-half + 0.17, wallY, 0]}
                     receiveShadow
                     onClick={onClick('left')}
@@ -114,7 +114,7 @@ function Walls({
                 <RoundedBox
                     args={[ROOM_SIZE, WALL_HEIGHT, WALL_THICKNESS]}
                     radius={0.05}
-                    smoothness={6}
+                    smoothness={2}
                     position={[0, wallY, -half + 0.17]}
                     receiveShadow
                     onClick={onClick('right')}
