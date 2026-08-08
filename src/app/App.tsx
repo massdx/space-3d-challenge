@@ -10,6 +10,7 @@ import { ToolWheel } from '../features/workspace/components/ToolWheel'
 import { WorkspaceControls } from '../features/workspace/components/WorkspaceControls'
 import { WorkspaceHeader } from '../features/workspace/components/WorkspaceHeader'
 import { WorkspaceScene } from '../features/workspace/components/WorkspaceScene'
+import { Analytics } from '@vercel/analytics/react';
 
 export function App() {
     useEffect(() => {
@@ -46,6 +47,7 @@ export function App() {
             <ToolWheel />
             <SceneLoader />
             <MobileGuard />
+            <Analytics />
         </main>
     )
 }
