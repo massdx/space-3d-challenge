@@ -8,9 +8,9 @@ import { resolveDropPosition } from '../../catalog/model/dropTarget'
 import { PlacedFurniture } from '../../catalog/ui/PlacedFurniture'
 import { RoomShell } from '../../room/ui/RoomShell'
 import { clampToRoom } from '../model/floor'
-import { useToolWheelStore } from '../model/toolWheelStore'
 import { useViewportStore, type OrbitLike } from '../model/viewportStore'
 import { useWorkspaceStore } from '../model/workspaceStore'
+import { AZ_STRETCH, CameraController, HARD_MAX_AZ, HARD_MIN_AZ } from './CameraController'
 
 const raycaster = new Raycaster()
 const pointer = new Vector2()
@@ -26,7 +26,11 @@ export function WorkspaceScene() {
     const place = useCatalogStore((state) => state.place)
     const select = useCatalogStore((state) => state.select)
     const selectSurface = useWorkspaceStore((state) => state.selectSurface)
-    const closeWheel = useToolWheelStore((state) => state.close)
+
+    const clearSelection = () => {
+        select(null)
+        selectSurface(null)
+    }
 
     const onDrop = (event: DragEvent<HTMLDivElement>) => {
         event.preventDefault()
@@ -57,16 +61,14 @@ export function WorkspaceScene() {
             shadows
             dpr={[1, 1.25]}
             frameloop="demand"
-            gl={{ alpha: true }}
+            gl={{ alpha: true, preserveDrawingBuffer: true }}
             style={{ background: 'transparent' }}
             onCreated={({ gl, camera }) => {
                 setRenderer(gl)
                 setCamera(camera)
             }}
             onPointerMissed={() => {
-                select(null)
-                selectSurface(null)
-                closeWheel()
+                clearSelection()
             }}
             onDragOver={(event) => event.preventDefault()}
             onContextMenu={(event) => event.preventDefault()}
@@ -118,10 +120,13 @@ export function WorkspaceScene() {
                 maxDistance={24}
                 minPolarAngle={0.85}
                 maxPolarAngle={1.08}
-                minAzimuthAngle={Math.PI / 6}
-                maxAzimuthAngle={Math.PI / 1.6}
+                minAzimuthAngle={HARD_MIN_AZ - AZ_STRETCH}
+                maxAzimuthAngle={HARD_MAX_AZ + AZ_STRETCH}
                 target={[-1.9, 1.7, -1.9]}
+                onStart={clearSelection}
             />
+
+            <CameraController />
 
             {/* <EffectComposer>
                 <Bloom

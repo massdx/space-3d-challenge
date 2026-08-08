@@ -6,6 +6,7 @@ import {
     RefreshIcon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
+import { play } from 'cuelume'
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
@@ -64,7 +65,10 @@ export function ToolWheel() {
                 key: 'appearance',
                 icon: PaintBoardIcon,
                 label: 'Apparence',
-                onClick: run(() => select(target.id)),
+                onClick: run(() => {
+                    select(target.id)
+                    selectSurface(null)
+                }),
             },
             {
                 key: 'pin',
@@ -89,7 +93,10 @@ export function ToolWheel() {
                 key: 'delete',
                 icon: Delete02Icon,
                 label: 'Supprimer',
-                onClick: run(() => remove(target.id)),
+                onClick: run(() => {
+                    play('droplet')
+                    remove(target.id)
+                }),
             },
         ]
     } else if (target?.kind === 'surface') {
@@ -98,7 +105,10 @@ export function ToolWheel() {
                 key: 'appearance',
                 icon: PaintBoardIcon,
                 label: 'Apparence',
-                onClick: run(() => selectSurface(target.id)),
+                onClick: run(() => {
+                    selectSurface(target.id)
+                    select(null)
+                }),
             },
         ]
     }

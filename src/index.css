@@ -1,3 +1,6 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Geist:ital,wght@0,100..900;1,100..900&family=Instrument+Serif:ital@0;1&display=swap');
+
 @import "tailwindcss";
 
 :root {
@@ -38,4 +41,45 @@ button:active {
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+@keyframes apple-spinner-fade {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.15;
+  }
+}
+
+.apple-spinner {
+  position: relative;
+  width: 36px;
+  height: 36px;
+}
+
+.apple-spinner span {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2.5px;
+  height: 9px;
+  margin-left: -1.25px;
+  border-radius: 2px;
+  background: #6b7280;
+  transform-origin: 1.25px 18px;
+  animation: apple-spinner-fade 1s linear infinite;
+}
+
+.instrument-serif-regular {
+  font-family: "Instrument Serif", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.instrument-serif-regular-italic {
+  font-family: "Instrument Serif", serif;
+  font-weight: 400;
+  font-style: italic;
 }
