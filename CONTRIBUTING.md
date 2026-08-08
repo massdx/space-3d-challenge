@@ -6,11 +6,11 @@ By participating, you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md
 
 ## Ways to contribute
 
-- 🐛 **Report bugs** — open an issue with clear reproduction steps.
-- 💡 **Suggest features** — describe the use case and the problem it solves.
-- 🧩 **Add 3D assets** — new furniture/decor (see the asset guidelines below).
-- 🛠️ **Fix issues / build features** — pick an open issue or propose your own.
-- 📖 **Improve docs** — typos, clarifications and examples are all welcome.
+-  **Report bugs** — open an issue with clear reproduction steps.
+-  **Suggest features** — describe the use case and the problem it solves.
+-  **Add 3D assets** — new furniture/decor (see the asset guidelines below).
+-  **Fix issues / build features** — pick an open issue or propose your own.
+-  **Improve docs** — typos, clarifications and examples are all welcome.
 
 ## Development setup
 
