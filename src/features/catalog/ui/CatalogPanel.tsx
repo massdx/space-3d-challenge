@@ -99,6 +99,7 @@ function CatalogCard({ item }: { item: CatalogItem }) {
             draggable
             onDragStart={onDragStart}
             title={item.name}
+            data-cuelume-hover="bloom"
             className="group flex aspect-square w-5/5 cursor-grab flex-col items-center justify-between gap-1 rounded-2xl border border-slate-900/10 bg-white/40 p-2 transition-colors hover:border-cyan-500/50 hover:bg-cyan-300/20 active:cursor-grabbing"
         >
             <div className="pointer-events-none min-h-0 w-full flex-1">

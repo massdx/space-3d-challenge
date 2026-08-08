@@ -9,12 +9,12 @@ export const useWorkspaceStore = create<WorkspaceState>((set) => ({
         })),
     windowSide: 'none',
     setWindowSide: (side) => set({ windowSide: side }),
-    wallColors: { left: null, right: null },
-    wallTextures: { left: 'none', right: 'none' },
-    selectedWall: null,
-    selectWall: (wall) => set({ selectedWall: wall }),
-    setWallColor: (wall, color) =>
-        set((state) => ({ wallColors: { ...state.wallColors, [wall]: color } })),
-    setWallTexture: (wall, texture) =>
-        set((state) => ({ wallTextures: { ...state.wallTextures, [wall]: texture } })),
+    surfaceColors: { left: null, right: null, floor: null },
+    surfaceTextures: { left: null, right: null, floor: null },
+    selectedSurface: null,
+    selectSurface: (surface) => set({ selectedSurface: surface }),
+    setSurfaceColor: (surface, color) =>
+        set((state) => ({ surfaceColors: { ...state.surfaceColors, [surface]: color } })),
+    setSurfaceTexture: (surface, texture) =>
+        set((state) => ({ surfaceTextures: { ...state.surfaceTextures, [surface]: texture } })),
 }))

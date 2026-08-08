@@ -2,8 +2,8 @@
 
 import { forwardRef, type ButtonHTMLAttributes } from 'react'
 
-type ButtonVariant = 'solid' | 'primary' | 'outline' | 'ghost'
-type ButtonSize = 'sm' | 'md' | 'lg'| 'xl'
+type ButtonVariant = 'solid' | 'primary' | 'black' | 'outline' | 'ghost'
+type ButtonSize = 'sm' | 'md' | 'lg' | 'xl'
 type ButtonShape = 'pill' | 'circle'
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -21,8 +21,9 @@ const base =
     'disabled:cursor-not-allowed disabled:opacity-50'
 
 const variants: Record<ButtonVariant, string> = {
-    solid: 'bg-neutral-300/90 border border-neutral-200/70 backdrop-blur text-neutral-800 hover:bg-neutral-300/80 active:bg-neutral-300/70',
-    primary: 'bg-cyan-500 text-white hover:bg-cyan-400 active:bg-cyan-600',
+    solid: 'bg-neutral-300 border border-neutral-200/70 backdrop-blur-xl text-neutral-800 hover:bg-neutral-300/90 active:bg-neutral-300/70',
+    primary: 'bg-cyan-600 text-white hover:bg-cyan-400 active:bg-cyan-600',
+    black: 'bg-black text-white hover:bg-neutral-900 active:bg-neutral-800',
     outline: 'border border-neutral-300 bg-transparent text-neutral-800 hover:bg-neutral-100',
     ghost: 'bg-transparent text-neutral-700 hover:bg-neutral-200/70',
 }
@@ -48,11 +49,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
 ) {
     return (
         <button
-        style={{
-            // boxShadow: 'inset -1px -1px 1.4px rgba(72, 72, 72, 0.25)',
-        }}
+            style={{
+                // boxShadow: 'inset -1px -1px 1.4px rgba(72, 72, 72, 0.25)',
+            }}
             ref={ref}
             type={type}
+            data-cuelume-press
             className={cn(base, variants[variant], sizes[shape][size], className)}
             {...props}
         >

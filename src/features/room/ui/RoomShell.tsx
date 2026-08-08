@@ -1,12 +1,20 @@
-import { RoundedBox } from '@react-three/drei'
+import { useTexture } from '@react-three/drei'
 import type { ThreeEvent } from '@react-three/fiber'
-import type { Texture } from 'three'
-import type { TextureId, WallId, WindowSide } from '../../workspace/model/types'
-import { getWallTexture } from '../../workspace/model/wallTextures'
+import { Suspense, useMemo, useRef } from 'react'
+import { ClampToEdgeWrapping, RepeatWrapping, SRGBColorSpace } from 'three'
+import { TEXTURE_BY_ID } from '../../workspace/model/textureCatalog'
+import { useToolWheelStore } from '../../workspace/model/toolWheelStore'
+import type { SurfaceId, WallId, WindowSide } from '../../workspace/model/types'
 import { useWorkspaceStore } from '../../workspace/model/workspaceStore'
 
 type RoomShellProps = {
     night: boolean
+}
+
+type SurfaceHandlers = {
+    onPointerDown: (event: ThreeEvent<PointerEvent>) => void
+    onPointerMove: (event: ThreeEvent<PointerEvent>) => void
+    onPointerUp: (event: ThreeEvent<PointerEvent>) => void
 }
 
 const WALL_HEIGHT = 4.6
@@ -16,23 +24,147 @@ const OPEN_W = 3.2
 const OPEN_H = 2.2
 const SILL = 1
 const FRAME_W = 0.14
+const LONG_PRESS_MS = 350
+const MOVE_CANCEL_PX = 8
+const WALL_ASPECT = ROOM_SIZE / WALL_HEIGHT
 
+const resolveTexture = (id: string | null) => {
+    const item = id ? TEXTURE_BY_ID[id] : undefined
+    return { url: item?.url ?? null, cover: item?.fit === 'cover' }
+}
+
+function TextureMaterial({
+    url,
+    color,
+    roughness,
+    repeat,
+    cover,
+    surfaceAspect,
+}: {
+    url: string
+    color: string
+    roughness: number
+    repeat: [number, number]
+    cover: boolean
+    surfaceAspect: number
+}) {
+    const base = useTexture(url)
+    // Clone: chaque surface a son propre repeat/offset même si l'image est partagée.
+    const texture = useMemo(() => base.clone(), [base])
+    useMemo(() => {
+        if (cover) {
+            texture.wrapS = ClampToEdgeWrapping
+            texture.wrapT = ClampToEdgeWrapping
+            const image = texture.image as { width?: number; height?: number } | undefined
+            const imageAspect =
+                image?.width && image?.height ? image.width / image.height : 1
+            const ratio = surfaceAspect / imageAspect
+            const rx = ratio >= 1 ? 1 : ratio
+            const ry = ratio >= 1 ? 1 / ratio : 1
+            texture.repeat.set(rx, ry)
+            texture.offset.set((1 - rx) / 2, (1 - ry) / 2)
+        } else {
+            texture.wrapS = RepeatWrapping
+            texture.wrapT = RepeatWrapping
+            texture.repeat.set(repeat[0], repeat[1])
+            texture.offset.set(0, 0)
+        }
+        texture.colorSpace = SRGBColorSpace
+        texture.needsUpdate = true
+    }, [texture, repeat, cover, surfaceAspect])
+    return <meshStandardMaterial map={texture} color={color} roughness={roughness} />
+}
+
+function SurfaceMaterial({
+    tint,
+    defaultColor,
+    url,
+    cover = false,
+    roughness = 0.85,
+    repeat = [1, 1],
+    surfaceAspect = 1,
+}: {
+    tint: string | null
+    defaultColor: string
+    url: string | null
+    cover?: boolean
+    roughness?: number
+    repeat?: [number, number]
+    surfaceAspect?: number
+}) {
+    return (
+        <Suspense
+            fallback={<meshStandardMaterial color={tint ?? defaultColor} roughness={roughness} />}
+        >
+            {url ? (
+                <TextureMaterial
+                    url={url}
+                    color={tint ?? '#ffffff'}
+                    roughness={roughness}
+                    repeat={repeat}
+                    cover={cover}
+                    surfaceAspect={surfaceAspect}
+                />
+            ) : (
+                <meshStandardMaterial color={tint ?? defaultColor} roughness={roughness} />
+            )}
+        </Suspense>
+    )
+}
 
 export function RoomShell({ night }: RoomShellProps) {
     const windowSide = useWorkspaceStore((state) => state.windowSide)
-    const wallColors = useWorkspaceStore((state) => state.wallColors)
-    const wallTextures = useWorkspaceStore((state) => state.wallTextures)
-    const selectWall = useWorkspaceStore((state) => state.selectWall)
+    const surfaceColors = useWorkspaceStore((state) => state.surfaceColors)
+    const surfaceTextures = useWorkspaceStore((state) => state.surfaceTextures)
+    const openWheel = useToolWheelStore((state) => state.openAt)
+
+    const press = useRef<{ timer: number | null; x: number; y: number }>({
+        timer: null,
+        x: 0,
+        y: 0,
+    })
+    const clearPress = () => {
+        if (press.current.timer !== null) {
+            clearTimeout(press.current.timer)
+            press.current.timer = null
+        }
+    }
+
+    const makeHandlers = (surface: SurfaceId): SurfaceHandlers => ({
+        onPointerDown: (event) => {
+            event.stopPropagation()
+            const { clientX, clientY } = event.nativeEvent
+            press.current.x = clientX
+            press.current.y = clientY
+            clearPress()
+            press.current.timer = window.setTimeout(() => {
+                press.current.timer = null
+                openWheel(clientX, clientY, { kind: 'surface', id: surface })
+            }, LONG_PRESS_MS)
+        },
+        onPointerMove: (event) => {
+            if (press.current.timer === null) return
+            const dx = event.nativeEvent.clientX - press.current.x
+            const dy = event.nativeEvent.clientY - press.current.y
+            if (Math.hypot(dx, dy) > MOVE_CANCEL_PX) clearPress()
+        },
+        onPointerUp: () => clearPress(),
+    })
 
     return (
         <group position={[0, 1, 0]}>
-            <Floor night={night} />
+            <Floor
+                night={night}
+                tint={surfaceColors.floor}
+                texture={resolveTexture(surfaceTextures.floor)}
+                handlers={makeHandlers('floor')}
+            />
             <Walls
                 night={night}
                 windowSide={windowSide}
-                wallColors={wallColors}
-                wallTextures={wallTextures}
-                onSelectWall={selectWall}
+                surfaceColors={surfaceColors}
+                surfaceTextures={surfaceTextures}
+                onSelectWall={makeHandlers}
             />
             <Frame />
             <UnderGlow />
@@ -40,44 +172,52 @@ export function RoomShell({ night }: RoomShellProps) {
     )
 }
 
-function Floor({ night }: { night: boolean }) {
+function Floor({
+    night,
+    tint,
+    texture,
+    handlers,
+}: {
+    night: boolean
+    tint: string | null
+    texture: { url: string | null; cover: boolean }
+    handlers: SurfaceHandlers
+}) {
     return (
-        <RoundedBox
-            args={[ROOM_SIZE, 0.5, ROOM_SIZE]}
-            radius={0.05}
-            smoothness={2}
-            position={[0, 0, 0]}
-            receiveShadow
-        >
-            <meshStandardMaterial color={night ? '#2f2f33' : '#3d3d42'} roughness={1} />
-        </RoundedBox>
+        <mesh position={[0, 0, 0]} receiveShadow {...handlers}>
+            <boxGeometry args={[ROOM_SIZE, 0.5, ROOM_SIZE]} />
+            <SurfaceMaterial
+                tint={tint}
+                defaultColor={night ? '#2f2f33' : '#3d3d42'}
+                url={texture.url}
+                cover={texture.cover}
+                roughness={1}
+                repeat={[4, 4]}
+                surfaceAspect={1}
+            />
+        </mesh>
     )
 }
 
 function Walls({
     night,
     windowSide,
-    wallColors,
-    wallTextures,
+    surfaceColors,
+    surfaceTextures,
     onSelectWall,
 }: {
     night: boolean
     windowSide: WindowSide
-    wallColors: Record<WallId, string | null>
-    wallTextures: Record<WallId, TextureId>
-    onSelectWall: (wall: WallId) => void
+    surfaceColors: Record<SurfaceId, string | null>
+    surfaceTextures: Record<SurfaceId, string | null>
+    onSelectWall: (wall: WallId) => SurfaceHandlers
 }) {
     const wallY = WALL_HEIGHT / 2 + 0.25
     const half = ROOM_SIZE / 2
-    const leftColor = wallColors.left ?? (night ? '#5b2b74' : '#7b3f96')
-    const rightColor = wallColors.right ?? (night ? '#7a4f96' : '#a678c4')
-    const leftTexture = getWallTexture(wallTextures.left)
-    const rightTexture = getWallTexture(wallTextures.right)
-
-    const onClick = (wall: WallId) => (event: ThreeEvent<MouseEvent>) => {
-        event.stopPropagation()
-        onSelectWall(wall)
-    }
+    const leftDefault = night ? '#5b2b74' : '#7b3f96'
+    const rightDefault = night ? '#7a4f96' : '#a678c4'
+    const left = resolveTexture(surfaceTextures.left)
+    const right = resolveTexture(surfaceTextures.right)
 
     return (
         <group>
@@ -85,42 +225,54 @@ function Walls({
                 <WallWithWindow
                     orientation="x"
                     position={[-half + 0.17, wallY, 0]}
-                    color={leftColor}
-                    texture={leftTexture}
-                    onClick={onClick('left')}
+                    tint={surfaceColors.left}
+                    defaultColor={leftDefault}
+                    texture={left}
+                    handlers={onSelectWall('left')}
                 />
             ) : (
-                <RoundedBox
-                    args={[WALL_THICKNESS, WALL_HEIGHT, ROOM_SIZE]}
-                    radius={0.05}
-                    smoothness={2}
+                <mesh
                     position={[-half + 0.17, wallY, 0]}
                     receiveShadow
-                    onClick={onClick('left')}
+                    {...onSelectWall('left')}
                 >
-                    <meshStandardMaterial color={leftColor} roughness={0.85} map={leftTexture} />
-                </RoundedBox>
+                    <boxGeometry args={[WALL_THICKNESS, WALL_HEIGHT, ROOM_SIZE]} />
+                    <SurfaceMaterial
+                        tint={surfaceColors.left}
+                        defaultColor={leftDefault}
+                        url={left.url}
+                        cover={left.cover}
+                        repeat={[3, 2]}
+                        surfaceAspect={WALL_ASPECT}
+                    />
+                </mesh>
             )}
 
             {windowSide === 'right' ? (
                 <WallWithWindow
                     orientation="z"
                     position={[0, wallY, -half + 0.17]}
-                    color={rightColor}
-                    texture={rightTexture}
-                    onClick={onClick('right')}
+                    tint={surfaceColors.right}
+                    defaultColor={rightDefault}
+                    texture={right}
+                    handlers={onSelectWall('right')}
                 />
             ) : (
-                <RoundedBox
-                    args={[ROOM_SIZE, WALL_HEIGHT, WALL_THICKNESS]}
-                    radius={0.05}
-                    smoothness={2}
+                <mesh
                     position={[0, wallY, -half + 0.17]}
                     receiveShadow
-                    onClick={onClick('right')}
+                    {...onSelectWall('right')}
                 >
-                    <meshStandardMaterial color={rightColor} roughness={0.85} map={rightTexture} />
-                </RoundedBox>
+                    <boxGeometry args={[ROOM_SIZE, WALL_HEIGHT, WALL_THICKNESS]} />
+                    <SurfaceMaterial
+                        tint={surfaceColors.right}
+                        defaultColor={rightDefault}
+                        url={right.url}
+                        cover={right.cover}
+                        repeat={[3, 2]}
+                        surfaceAspect={WALL_ASPECT}
+                    />
+                </mesh>
             )}
         </group>
     )
@@ -129,15 +281,17 @@ function Walls({
 function WallWithWindow({
     orientation,
     position,
-    color,
+    tint,
+    defaultColor,
     texture,
-    onClick,
+    handlers,
 }: {
     orientation: 'x' | 'z'
     position: [number, number, number]
-    color: string
-    texture: Texture | null
-    onClick?: (event: ThreeEvent<MouseEvent>) => void
+    tint: string | null
+    defaultColor: string
+    texture: { url: string | null; cover: boolean }
+    handlers?: SurfaceHandlers
 }) {
     const halfH = WALL_HEIGHT / 2
     const openBottom = -halfH + SILL
@@ -154,10 +308,14 @@ function WallWithWindow({
             : { pos: [u, y, 0] as const, args: [span, height, normal] as const }
 
     const segments = [
-        box(0, -halfH + SILL / 2, ROOM_SIZE, SILL),
-        box(0, (openTop + halfH) / 2, ROOM_SIZE, halfH - openTop),
-        box(-sideU, openCenterY, sideSpan, OPEN_H),
-        box(sideU, openCenterY, sideSpan, OPEN_H),
+        { ...box(0, -halfH + SILL / 2, ROOM_SIZE, SILL), span: ROOM_SIZE, height: SILL },
+        {
+            ...box(0, (openTop + halfH) / 2, ROOM_SIZE, halfH - openTop),
+            span: ROOM_SIZE,
+            height: halfH - openTop,
+        },
+        { ...box(-sideU, openCenterY, sideSpan, OPEN_H), span: sideSpan, height: OPEN_H },
+        { ...box(sideU, openCenterY, sideSpan, OPEN_H), span: sideSpan, height: OPEN_H },
     ]
 
     const frame = [
@@ -174,11 +332,18 @@ function WallWithWindow({
         orientation === 'x' ? [0.7, openCenterY, 0] : [0, openCenterY, 0.7]
 
     return (
-        <group position={position} onClick={onClick}>
+        <group position={position} {...handlers}>
             {segments.map((segment, index) => (
                 <mesh key={index} position={segment.pos} receiveShadow castShadow>
                     <boxGeometry args={segment.args} />
-                    <meshStandardMaterial color={color} roughness={0.85} map={texture} />
+                    <SurfaceMaterial
+                        tint={tint}
+                        defaultColor={defaultColor}
+                        url={texture.url}
+                        cover={texture.cover}
+                        repeat={[3, 2]}
+                        surfaceAspect={segment.span / segment.height}
+                    />
                 </mesh>
             ))}
 
