@@ -7,7 +7,7 @@ type HelpState = {
 }
 
 export const useHelpStore = create<HelpState>((set) => ({
-    open: false,
+    open: true,
     toggle: () => set((state) => ({ open: !state.open })),
     close: () => set({ open: false }),
 }))

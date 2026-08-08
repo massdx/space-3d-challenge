@@ -94,7 +94,7 @@ export function ShareDialog({ open, onClose }: { open: boolean; onClose: () => v
 
 
                         <div className="mt-5 space-y-3">
-                            <Button className="w-full" onClick={copyLink}>
+                            <Button variant='black' className="w-full" onClick={copyLink}>
                                 <HugeiconsIcon icon={copied ? Tick02Icon : Copy01Icon} size={18} strokeWidth={1.8} />
                                 <span>{copied ? 'Lien copié' : 'Copier le lien de partage'}</span>
                             </Button>

@@ -127,15 +127,6 @@ export function WorkspaceScene() {
             />
 
             <CameraController />
-
-            {/* <EffectComposer>
-                <Bloom
-                    mipmapBlur
-                    intensity={1}
-                    luminanceThreshold={0.1}
-                    luminanceSmoothing={5}
-                />
-            </EffectComposer> */}
         </Canvas>
     )
 }

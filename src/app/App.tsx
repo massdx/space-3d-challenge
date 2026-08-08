@@ -4,6 +4,7 @@ import { useCatalogStore } from '../features/catalog/model/catalogStore'
 import { decodeScene, readShareCodeFromHash } from '../features/catalog/model/sceneShare'
 import { DragPreview, ThumbnailCanvas } from '../features/catalog/ui/CatalogThumbnail'
 import { ControlsLegend } from '../features/workspace/components/ControlsLegend'
+import { MobileGuard } from '../features/workspace/components/MobileGuard'
 import { SceneLoader } from '../features/workspace/components/SceneLoader'
 import { ToolWheel } from '../features/workspace/components/ToolWheel'
 import { WorkspaceControls } from '../features/workspace/components/WorkspaceControls'
@@ -31,7 +32,7 @@ export function App() {
         <main
             className="relative h-screen bg-white w-screen overflow-hidden text-slate-100"
             style={{
-                
+
                 background:
                     'radial-gradient(68.02% 68.02% at 50% 50%, #E3E3E3 13.6%, #FFFFFF 100%)',
             }}
@@ -44,6 +45,7 @@ export function App() {
             <DragPreview />
             <ToolWheel />
             <SceneLoader />
+            <MobileGuard />
         </main>
     )
 }

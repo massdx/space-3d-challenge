@@ -6,6 +6,7 @@ import { Box3, Mesh, Vector3 } from 'three'
 import { clone as cloneSkeleton } from 'three/examples/jsm/utils/SkeletonUtils.js'
 import { CATALOG_BY_ID } from '../model/catalog'
 import { useDragPreviewStore } from '../model/dragPreviewStore'
+import { useThumbnailCanvasStore } from '../model/thumbnailCanvasStore'
 
 function ThumbModel({ url }: { url: string }) {
     const { scene } = useGLTF(url)
@@ -60,11 +61,16 @@ export const activeGrid: { current: HTMLElement | null } = { current: null }
 
 export function ThumbnailCanvas() {
     const wrapperRef = useRef<HTMLDivElement>(null)
+    const active = useThumbnailCanvasStore((state) => state.active)
 
     useEffect(() => {
+        const wrapper = wrapperRef.current
+        if (!active) {
+            if (wrapper) wrapper.style.clipPath = 'inset(50%)'
+            return
+        }
         let frame = 0
         const update = () => {
-            const wrapper = wrapperRef.current
             const clip = activeGrid.current
             if (wrapper) {
                 if (clip) {
@@ -82,7 +88,7 @@ export function ThumbnailCanvas() {
         }
         frame = requestAnimationFrame(update)
         return () => cancelAnimationFrame(frame)
-    }, [])
+    }, [active])
 
     return createPortal(
         <div
@@ -92,6 +98,7 @@ export function ThumbnailCanvas() {
             <Canvas
                 style={{ width: '100%', height: '100%', pointerEvents: 'none' }}
                 dpr={[1, 1.5]}
+                frameloop={active ? 'always' : 'never'}
                 gl={{ alpha: true, antialias: true }}
             >
                 <View.Port />
