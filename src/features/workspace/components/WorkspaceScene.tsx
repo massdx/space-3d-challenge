@@ -132,7 +132,7 @@ export function WorkspaceScene() {
                 enableDamping
                 minDistance={4.5}
                 maxDistance={24}
-                minPolarAngle={0.85}
+                minPolarAngle={0.55}
                 maxPolarAngle={1.08}
                 minAzimuthAngle={HARD_MIN_AZ - AZ_STRETCH}
                 maxAzimuthAngle={HARD_MAX_AZ + AZ_STRETCH}

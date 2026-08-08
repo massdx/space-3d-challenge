@@ -4,8 +4,8 @@ import { useEffect, useRef } from 'react'
 import { Vector3 } from 'three'
 import { INITIAL_CAMERA, INITIAL_TARGET } from '../model/viewportStore'
 
-export const HARD_MIN_AZ = Math.PI / 6
-export const HARD_MAX_AZ = Math.PI / 1.6
+export const HARD_MIN_AZ = Math.PI / 12
+export const HARD_MAX_AZ = Math.PI / 1.4
 export const AZ_STRETCH = 0.13
 
 const INTRO_MS = 1300

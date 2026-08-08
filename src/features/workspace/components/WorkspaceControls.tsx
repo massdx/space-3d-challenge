@@ -141,7 +141,7 @@ export function WorkspaceControls() {
 
                 </motion.div>
 
-                <div className="pointer-events-none absolute p-4 sm:p-6 bottom-0 right-0 left-0 mx-auto translate-x-1/2 space-x-3">
+                <div className="pointer-events-none absolute p-4 sm:p-6 bottom-0 right-0 left-0 flex justify-center">
                     <AnimatePresence>
                         {historyStarted && (
                             <motion.div

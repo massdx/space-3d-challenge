@@ -1,10 +1,16 @@
 import { useTexture } from '@react-three/drei'
 import type { ThreeEvent } from '@react-three/fiber'
+import { useFrame } from '@react-three/fiber'
 import { Suspense, useMemo, useRef } from 'react'
 import {
     AdditiveBlending,
     CanvasTexture,
     ClampToEdgeWrapping,
+    type Group,
+    type Material,
+    MathUtils,
+    Mesh,
+    type Object3D,
     RepeatWrapping,
     SRGBColorSpace,
 } from 'three'
@@ -205,6 +211,24 @@ function Floor({
     )
 }
 
+// Opacité originale de chaque matériau, pour ne pas écraser le verre translucide en fondu.
+const baseOpacity = new WeakMap<Material, number>()
+
+function applyWallOpacity(root: Object3D, op: number) {
+    root.traverse((child) => {
+        if (!(child instanceof Mesh)) return
+        const mats = Array.isArray(child.material) ? child.material : [child.material]
+        for (const m of mats) {
+            if (!m) continue
+            const base = baseOpacity.get(m) ?? m.opacity
+            if (!baseOpacity.has(m)) baseOpacity.set(m, base)
+            m.opacity = base * op
+            m.transparent = m.opacity < 0.99
+            m.depthWrite = m.opacity > 0.99
+        }
+    })
+}
+
 function Walls({
     night,
     windowSide,
@@ -225,61 +249,86 @@ function Walls({
     const left = resolveTexture(surfaceTextures.left)
     const right = resolveTexture(surfaceTextures.right)
 
+    const leftRef = useRef<Group>(null)
+    const rightRef = useRef<Group>(null)
+    const leftOp = useRef(1)
+    const rightOp = useRef(1)
+
+    // Fond un mur quand la caméra passe derrière son plan, pour voir l'intérieur.
+    useFrame(({ camera, invalidate }) => {
+        const wallCoord = -half + 0.17
+        const step = (root: Group | null, camAxis: number, store: { current: number }) => {
+            if (!root) return false
+            const t = MathUtils.clamp((camAxis - wallCoord) / 1.2, 0, 1)
+            const target = 0.1 + 0.9 * t
+            store.current = MathUtils.lerp(store.current, target, 0.16)
+            applyWallOpacity(root, store.current)
+            return Math.abs(store.current - target) > 0.004
+        }
+        const a = step(leftRef.current, camera.position.x, leftOp)
+        const b = step(rightRef.current, camera.position.z, rightOp)
+        if (a || b) invalidate()
+    })
+
     return (
         <group>
-            {windowSide === 'left' ? (
-                <WallWithWindow
-                    orientation="x"
-                    position={[-half + 0.17, wallY, 0]}
-                    tint={surfaceColors.left}
-                    defaultColor={leftDefault}
-                    texture={left}
-                    handlers={onSelectWall('left')}
-                />
-            ) : (
-                <mesh
-                    position={[-half + 0.17, wallY, 0]}
-                    receiveShadow
-                    {...onSelectWall('left')}
-                >
-                    <boxGeometry args={[WALL_THICKNESS, WALL_HEIGHT, ROOM_SIZE]} />
-                    <SurfaceMaterial
+            <group ref={leftRef}>
+                {windowSide === 'left' ? (
+                    <WallWithWindow
+                        orientation="x"
+                        position={[-half + 0.17, wallY, 0]}
                         tint={surfaceColors.left}
                         defaultColor={leftDefault}
-                        url={left.url}
-                        cover={left.cover}
-                        repeat={[3, 2]}
-                        surfaceAspect={WALL_ASPECT}
+                        texture={left}
+                        handlers={onSelectWall('left')}
                     />
-                </mesh>
-            )}
+                ) : (
+                    <mesh
+                        position={[-half + 0.17, wallY, 0]}
+                        receiveShadow
+                        {...onSelectWall('left')}
+                    >
+                        <boxGeometry args={[WALL_THICKNESS, WALL_HEIGHT, ROOM_SIZE]} />
+                        <SurfaceMaterial
+                            tint={surfaceColors.left}
+                            defaultColor={leftDefault}
+                            url={left.url}
+                            cover={left.cover}
+                            repeat={[3, 2]}
+                            surfaceAspect={WALL_ASPECT}
+                        />
+                    </mesh>
+                )}
+            </group>
 
-            {windowSide === 'right' ? (
-                <WallWithWindow
-                    orientation="z"
-                    position={[0, wallY, -half + 0.17]}
-                    tint={surfaceColors.right}
-                    defaultColor={rightDefault}
-                    texture={right}
-                    handlers={onSelectWall('right')}
-                />
-            ) : (
-                <mesh
-                    position={[0, wallY, -half + 0.17]}
-                    receiveShadow
-                    {...onSelectWall('right')}
-                >
-                    <boxGeometry args={[ROOM_SIZE, WALL_HEIGHT, WALL_THICKNESS]} />
-                    <SurfaceMaterial
+            <group ref={rightRef}>
+                {windowSide === 'right' ? (
+                    <WallWithWindow
+                        orientation="z"
+                        position={[0, wallY, -half + 0.17]}
                         tint={surfaceColors.right}
                         defaultColor={rightDefault}
-                        url={right.url}
-                        cover={right.cover}
-                        repeat={[3, 2]}
-                        surfaceAspect={WALL_ASPECT}
+                        texture={right}
+                        handlers={onSelectWall('right')}
                     />
-                </mesh>
-            )}
+                ) : (
+                    <mesh
+                        position={[0, wallY, -half + 0.17]}
+                        receiveShadow
+                        {...onSelectWall('right')}
+                    >
+                        <boxGeometry args={[ROOM_SIZE, WALL_HEIGHT, WALL_THICKNESS]} />
+                        <SurfaceMaterial
+                            tint={surfaceColors.right}
+                            defaultColor={rightDefault}
+                            url={right.url}
+                            cover={right.cover}
+                            repeat={[3, 2]}
+                            surfaceAspect={WALL_ASPECT}
+                        />
+                    </mesh>
+                )}
+            </group>
         </group>
     )
 }
