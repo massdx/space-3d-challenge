@@ -1,4 +1,4 @@
-import { Camera01Icon, HelpCircleIcon, LinkBackwardIcon, Settings01Icon, VolumeHighIcon, VolumeOffIcon } from '@hugeicons/core-free-icons'
+import { Camera01Icon, HelpCircleIcon, LinkForwardIcon, Settings01Icon, VolumeHighIcon, VolumeOffIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
@@ -69,7 +69,7 @@ export function WorkspaceHeader() {
                     <span className="text-sm text-neutral-700">A 3D space for your ideas</span>
                 </p>
                 {/* <p className="text-sm mix-blend-difference text-neutral-700">by <a href="https://descraft.xyz" target="_blank" rel="noopener noreferrer" className="underline">MassHDX</a></p> */}
-                <p className="text-sm text-neutral-700"><a href="https://github.com/descraft" target="_blank" rel="noopener noreferrer" className="underline"> GitHub</a></p>
+                <p className="text-sm text-neutral-700"><a href="https://github.com/massdx/space-3d-challenge" target="_blank" rel="noopener noreferrer" className="underline"> GitHub</a></p>
                 {/* <input placeholder='File name' value={"Test micro"} className="border text-xl border-none  focus-within:ring-2 ring-neutral-700 outline-none  text-neutral-900 px-3 font-medium  h-12 rounded-xl  py-1" /> */}
             </div>
             <motion.div
@@ -103,8 +103,8 @@ export function WorkspaceHeader() {
                     </Button>
                 </motion.span>
                 <motion.span className="inline-block" variants={itemVariants} transition={itemTransition}>
-                    <Button onClick={() => setShareOpen(true)}>
-                        <HugeiconsIcon icon={LinkBackwardIcon} size={20} className='' strokeWidth={1.8} />
+                    <Button variant="black" onClick={() => setShareOpen(true)}>
+                        <HugeiconsIcon icon={LinkForwardIcon} size={20} className='' strokeWidth={1.8} />
                         <span>
                             Share or Export
                         </span>

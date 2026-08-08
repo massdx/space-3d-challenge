@@ -1,8 +1,28 @@
 {
-  "name": "space-3d-challenge",
+  "name": "descraft",
+  "version": "0.1.0",
   "private": true,
-  "version": "0.0.0",
+  "description": "Descraft — design and customize your dream developer workspace in 3D, right in the browser.",
   "type": "module",
+  "license": "MIT",
+  "author": "massdx",
+  "homepage": "https://github.com/massdx/space-3d-challenge#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/massdx/space-3d-challenge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/massdx/space-3d-challenge/issues"
+  },
+  "keywords": [
+    "3d",
+    "three.js",
+    "react-three-fiber",
+    "react",
+    "typescript",
+    "configurator",
+    "workspace"
+  ],
   "scripts": {
     "dev": "vite",
     "start": "vite",

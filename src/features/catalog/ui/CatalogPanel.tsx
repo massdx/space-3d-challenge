@@ -5,6 +5,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '../../../components/ui/
 import { CATALOG, type CatalogItem } from '../model/catalog'
 import { DRAG_MIME } from '../model/catalogStore'
 import { useDragPreviewStore } from '../model/dragPreviewStore'
+import { useThumbnailCanvasStore } from '../model/thumbnailCanvasStore'
 import { Thumbnail, activeGrid } from './CatalogThumbnail'
 
 type Tab = 'store' | 'upload'
@@ -28,8 +29,14 @@ export function CatalogPopover({ children }: { children: ReactNode }) {
     }, [])
 
     const registerGrid = useCallback((el: HTMLDivElement | null) => {
-        if (el) activeGrid.current = el
-        else if (activeGrid.current === gridRef.current) activeGrid.current = null
+        const setActive = useThumbnailCanvasStore.getState().setActive
+        if (el) {
+            activeGrid.current = el
+            setActive(true)
+        } else if (activeGrid.current === gridRef.current) {
+            activeGrid.current = null
+            setActive(false)
+        }
         gridRef.current = el
     }, [])
 
