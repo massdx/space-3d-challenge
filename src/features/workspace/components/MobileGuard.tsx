@@ -1,0 +1,44 @@
+import { Github01Icon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { useState } from 'react'
+
+const GITHUB_URL = 'https://github.com/massdx/space-3d-challenge'
+
+export function MobileGuard() {
+    const [gifBroken, setGifBroken] = useState(false)
+
+    return (
+        <div className="fixed inset-0 z-100 flex flex-col items-center justify-center gap-4 bg-white p-8 text-center md:hidden">
+            {gifBroken ? (
+                <div className="grid h-48 w-48 place-items-center rounded-2xl bg-neutral-100 text-6xl">
+                    
+                </div>
+            ) : (
+                <img
+                    src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2Rtc21kd2Yzb3h6MmZucGY5NWYzdTRrcXBidjA3aGVkNXM0a2o5diZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ZqlvCTNHpqrio/giphy.gif"
+                    alt="meme"
+                    onError={() => setGifBroken(true)}
+                    className=" rounded-2xl object-cover mb-4 "
+                />
+            )}
+
+            <h1 className="max-w-sm instrument-serif-regular  text-2xl font-semibold text-neutral-900">
+                You can also contribute with responsiveness
+            </h1>
+
+            <p className="max-w-xs text-sm text-neutral-500">
+                Descraft isn't built for mobile yet. Open it on a larger screen  or come help out!
+            </p>
+
+            <a
+                href={GITHUB_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="absolute bottom-8 inline-flex items-center gap-2 rounded-full bg-neutral-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-neutral-800"
+            >
+                <svg className=' size-6' fill='#fff' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><path d="M280.5 426.5C214.5 418.5 168 371 168 309.5C168 284.5 177 257.5 192 239.5C185.5 223 186.5 188 194 173.5C214 171 241 181.5 257 196C276 190 296 187 320.5 187C345 187 365 190 383 195.5C398.5 181.5 426 171 446 173.5C453 187 454 222 447.5 239C463.5 258 472 283.5 472 309.5C472 371 425.5 417.5 358.5 426C375.5 437 387 461 387 488.5L387 540.5C387 555.5 399.5 564 414.5 558C505 523.5 576 433 576 321C576 179.5 461 64 319.5 64C178 64 64 179.5 64 321C64 432 134.5 524 229.5 558.5C243 563.5 256 554.5 256 541L256 501C249 504 240 506 232 506C199 506 179.5 488 165.5 454.5C160 441 154 433 142.5 431.5C136.5 431 134.5 428.5 134.5 425.5C134.5 419.5 144.5 415 154.5 415C169 415 181.5 424 194.5 442.5C204.5 457 215 463.5 227.5 463.5C240 463.5 248 459 259.5 447.5C268 439 274.5 431.5 280.5 426.5z" /></svg>
+                <span>Contribute on GitHub</span>
+            </a>
+        </div>
+    )
+}
