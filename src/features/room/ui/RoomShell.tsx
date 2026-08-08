@@ -1,7 +1,13 @@
 import { useTexture } from '@react-three/drei'
 import type { ThreeEvent } from '@react-three/fiber'
 import { Suspense, useMemo, useRef } from 'react'
-import { ClampToEdgeWrapping, RepeatWrapping, SRGBColorSpace } from 'three'
+import {
+    AdditiveBlending,
+    CanvasTexture,
+    ClampToEdgeWrapping,
+    RepeatWrapping,
+    SRGBColorSpace,
+} from 'three'
 import { TEXTURE_BY_ID } from '../../workspace/model/textureCatalog'
 import { useToolWheelStore } from '../../workspace/model/toolWheelStore'
 import type { SurfaceId, WallId, WindowSide } from '../../workspace/model/types'
@@ -381,41 +387,47 @@ function Frame() {
     )
 }
 
-function UnderGlow() {
-    const half = ROOM_SIZE / 2
-    const t = 0.14
-    const y = -0.25
+// Halo doux localisé sous la pièce : glow plein et flouté qui bave sous la plateforme.
+const GLOW_PLANE = ROOM_SIZE * 2.25
 
-    return (
-        <group>
-            <GlowBar position={[0, y, half]} args={[ROOM_SIZE, t, t]} />
-            <GlowBar position={[0, y, -half]} args={[ROOM_SIZE, t, t]} />
-            <GlowBar position={[-half, y, 0]} args={[t, t, ROOM_SIZE]} />
-            <GlowBar position={[half, y, 0]} args={[t, t, ROOM_SIZE]} />
-
-            <GlowBar position={[half, y, half]} args={[t, t, t]} />
-
-
-            <pointLight position={[0, y - 0.3, half]} color="#22d3ee" intensity={6} distance={6} />
-            <pointLight position={[half, y - 0.3, 0]} color="#22d3ee" intensity={6} distance={6} />
-        </group>
-    )
+function useGlowTexture() {
+    return useMemo(() => {
+        const size = 512
+        const canvas = document.createElement('canvas')
+        canvas.width = size
+        canvas.height = size
+        const ctx = canvas.getContext('2d')!
+        // L'empreinte de la pièce occupe la fraction centrale ; le reste laisse baver le halo.
+        const inset = size * ((1 - ROOM_SIZE / GLOW_PLANE) / 2)
+        const side = size - inset * 2
+        const radius = 40
+        ctx.fillStyle = '#22d3ee'
+        ctx.shadowColor = '#22d3ee'
+        for (const blur of [24, 48, 90]) {
+            ctx.shadowBlur = blur
+            ctx.beginPath()
+            ctx.roundRect(inset, inset, side, side, radius)
+            ctx.fill()
+        }
+        const texture = new CanvasTexture(canvas)
+        texture.colorSpace = SRGBColorSpace
+        return texture
+    }, [])
 }
 
-function GlowBar({
-    position,
-    args,
-}: {
-    position: [number, number, number]
-    args: [number, number, number]
-}) {
+function UnderGlow() {
+    const y = -0.25
+    const glow = useGlowTexture()
+
     return (
-        <mesh position={position}>
-            <boxGeometry args={args} />
-            <meshStandardMaterial
-                color="#a5f3fc"
-                emissive="#22d3ee"
-                emissiveIntensity={0.5}
+        <mesh position={[0, y - 0.06, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[GLOW_PLANE, GLOW_PLANE]} />
+            <meshBasicMaterial
+                map={glow}
+                transparent
+                opacity={0.4}
+                blending={AdditiveBlending}
+                depthWrite={false}
                 toneMapped={false}
             />
         </mesh>
