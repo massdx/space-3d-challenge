@@ -5,6 +5,8 @@ import { Raycaster, Vector2 } from 'three'
 import { CATALOG, CATALOG_BY_ID } from '../../catalog/model/catalog'
 import { DRAG_MIME, useCatalogStore } from '../../catalog/model/catalogStore'
 import { resolveDropPosition } from '../../catalog/model/dropTarget'
+import { getFootprint } from '../../catalog/model/footprint'
+import { resolveWallHit, wallPlacement } from '../../catalog/model/wallPlacement'
 import { PlacedFurniture } from '../../catalog/ui/PlacedFurniture'
 import { RoomShell } from '../../room/ui/RoomShell'
 import { clampToRoom } from '../model/floor'
@@ -46,6 +48,18 @@ export function WorkspaceScene() {
             -((event.clientY - rect.top) / rect.height) * 2 + 1,
         )
         raycaster.setFromCamera(pointer, camera)
+
+        const model = CATALOG_BY_ID[modelId]
+        if (model.placement === 'wall') {
+            const footprint = getFootprint(model.url)
+            const hit = resolveWallHit(raycaster)
+            if (footprint && hit) {
+                const { position, rotationY } = wallPlacement(hit, footprint, 1)
+                place(modelId, position, rotationY)
+                return
+            }
+            // Empreinte pas encore connue (1er dépôt) : on pose au sol, l'objet se glisse ensuite sur le mur.
+        }
 
         const position = resolveDropPosition(raycaster)
         if (!position) return

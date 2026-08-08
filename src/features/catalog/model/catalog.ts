@@ -157,13 +157,6 @@ export const CATALOG: CatalogItem[] = [
         targetSize: 0.6,
     },
     {
-        id: 'rug-modern',
-        name: 'Modern Rug',
-        url: path('Modern rug by Poly by Google - bXH5RpSa88Q.glb'),
-        category: 'rug',
-        targetSize: 2.5,
-    },
-    {
         id: 'rug-poly',
         name: 'Rug',
         url: path('Rug by Poly by Google - epuypdA3tpO.glb'),
