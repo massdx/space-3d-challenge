@@ -8,7 +8,7 @@ Descraft is an interactive 3D configurator where you drag furniture into a room,
 
 ---
 
-## ✨ Features
+##  Features
 
 - **Drag & drop catalog** — desks, chairs, monitors, keyboards, sofas, lamps, rugs and decor, dropped straight into the scene.
 - **Free placement & editing** — move, rotate, scale, lock and delete placed items with snapping to the floor.
@@ -20,7 +20,7 @@ Descraft is an interactive 3D configurator where you drag furniture into a room,
 - **Import / export JSON** — save a configuration to disk and load it back later.
 - **Lo-fi ambience** — optional background audio to set the mood.
 
-## 🧱 Tech stack
+##  Tech stack
 
 | Layer            | Choice                                                                 |
 | ---------------- | --------------------------------------------------------------------- |
@@ -34,7 +34,7 @@ Descraft is an interactive 3D configurator where you drag furniture into a room,
 | Animation        | [Motion](https://motion.dev)                                         |
 | Linting          | [ESLint](https://eslint.org) + [typescript-eslint](https://typescript-eslint.io) |
 
-## 🚀 Getting started
+##  Getting started
 
 ### Prerequisites
 
@@ -59,7 +59,7 @@ Then open the URL printed in the terminal (defaults to `http://localhost:5173`).
 | `pnpm preview` | Preview the production build locally         |
 | `pnpm lint`    | Run ESLint across the project                |
 
-## 🗂️ Project structure
+##  Project structure
 
 The codebase follows a lightweight **feature-sliced** layout: each feature owns its `model/` (state, domain logic) and its UI (`ui/` or `components/`).
 
@@ -83,24 +83,24 @@ public/
 └── audio/                    # lo-fi ambience track
 ```
 
-## 🔗 How scene sharing works
+##  How scene sharing works
 
 A placed scene is serialized into a compact array per item — `[modelId, x, y, z, rotationY, scale, locked]` — versioned, rounded and clamped, then encoded into the URL hash. On load, the app reads the hash, validates every item against the catalog (unknown models and out-of-bounds values are rejected), and rebuilds the layout. See [src/features/catalog/model/sceneShare.ts](src/features/catalog/model/sceneShare.ts).
 
-## 🤖 AI usage
+##  AI usage
 
 Parts of this project (documentation, refactors, boilerplate) were assisted by AI tooling. All 3D interaction logic, architecture decisions and asset curation were reviewed and validated by a human.
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow, coding conventions and branch strategy, and follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
-## 🖼️ Credits & asset attribution
+##  Credits & asset attribution
 
 The **source code** is MIT-licensed. The **3D models and textures** under `public/` are third-party assets and remain the property of their respective authors, each under its own license. Please verify individual licenses before reusing them commercially.
 
 3D models come from creators including **Poly by Google**, **Quaternius**, **CreativeTrio**, **FUS3N**, **Jarlan Perez**, **jeff cobesign** and others (author names are preserved in the model filenames). If you are an author and want an attribution updated or an asset removed, please open an issue.
 
-## 📄 License
+##  License
 
 Released under the [MIT License](LICENSE) © massdx.
