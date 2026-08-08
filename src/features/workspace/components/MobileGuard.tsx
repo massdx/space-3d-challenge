@@ -1,5 +1,3 @@
-import { Github01Icon } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react'
 import { useState } from 'react'
 
 const GITHUB_URL = 'https://github.com/massdx/space-3d-challenge'
@@ -11,7 +9,7 @@ export function MobileGuard() {
         <div className="fixed inset-0 z-100 flex flex-col items-center justify-center gap-4 bg-white p-8 text-center md:hidden">
             {gifBroken ? (
                 <div className="grid h-48 w-48 place-items-center rounded-2xl bg-neutral-100 text-6xl">
-                    
+
                 </div>
             ) : (
                 <img

@@ -1,4 +1,4 @@
-import { Camera01Icon, HelpCircleIcon, LinkBackwardIcon, LinkForwardIcon, Settings01Icon, VolumeHighIcon, VolumeOffIcon } from '@hugeicons/core-free-icons'
+import { Camera01Icon, HelpCircleIcon, LinkForwardIcon, Settings01Icon, VolumeHighIcon, VolumeOffIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
