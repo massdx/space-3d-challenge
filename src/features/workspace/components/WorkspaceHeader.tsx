@@ -1,12 +1,12 @@
-import { Camera01Icon, Github01Icon, HelpCircleIcon, LinkBackwardIcon, Settings01Icon, VolumeHighIcon, VolumeOffIcon } from '@hugeicons/core-free-icons'
+import { Camera01Icon, HelpCircleIcon, LinkBackwardIcon, Settings01Icon, VolumeHighIcon, VolumeOffIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 import Button from '../../../components/ui/button'
 import { useHelpStore } from '../model/helpStore'
 import { useViewportStore } from '../model/viewportStore'
-import { SettingsPopover } from './WorkspaceSettings'
 import { ShareDialog } from './ShareDialog'
+import { SettingsPopover } from './WorkspaceSettings'
 
 const itemVariants = {
     hidden: { opacity: 0, y: -10, scale: 0.9, filter: 'blur(4px)' },

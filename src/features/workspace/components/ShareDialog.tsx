@@ -16,7 +16,6 @@ type Feedback = { tone: 'ok' | 'error'; text: string } | null
 export function ShareDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
     const items = useCatalogStore((state) => state.items)
     const loadItems = useCatalogStore((state) => state.loadItems)
-    const [link, setLink] = useState('')
     const [copied, setCopied] = useState(false)
     const [feedback, setFeedback] = useState<Feedback>(null)
     const fileInput = useRef<HTMLInputElement | null>(null)
@@ -32,7 +31,6 @@ export function ShareDialog({ open, onClose }: { open: boolean; onClose: () => v
     const copyLink = async () => {
         const code = await encodeScene(sceneItems)
         const url = buildShareUrl(code)
-        setLink(url)
         try {
             await navigator.clipboard.writeText(url)
             setCopied(true)
@@ -71,7 +69,8 @@ export function ShareDialog({ open, onClose }: { open: boolean; onClose: () => v
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ ease: 'easeInOut'
+                    transition={{
+                        ease: 'easeInOut'
                     }}
                 >
                     <div className="absolute inset-0 bg-neutral-600/80 backdrop-blur-sm" onClick={onClose} />
@@ -80,7 +79,7 @@ export function ShareDialog({ open, onClose }: { open: boolean; onClose: () => v
                         initial={{ opacity: 0, y: 16, scale: 0.96 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 12, scale: 0.97 }}
-                        transition={{ type: 'spring', stiffness: 300 , damping: 20,  }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 20, }}
                     >
                         <div className="flex items-center justify-between">
                             <h2 className="text-lg instrument-serif-regular font-semibold">Partager la scène</h2>
@@ -95,7 +94,7 @@ export function ShareDialog({ open, onClose }: { open: boolean; onClose: () => v
 
 
                         <div className="mt-5 space-y-3">
-                            <Button className="w-full"  onClick={copyLink}>
+                            <Button className="w-full" onClick={copyLink}>
                                 <HugeiconsIcon icon={copied ? Tick02Icon : Copy01Icon} size={18} strokeWidth={1.8} />
                                 <span>{copied ? 'Lien copié' : 'Copier le lien de partage'}</span>
                             </Button>

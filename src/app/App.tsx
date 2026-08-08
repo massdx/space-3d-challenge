@@ -31,8 +31,9 @@ export function App() {
         <main
             className="relative h-screen bg-white w-screen overflow-hidden text-slate-100"
             style={{
-                // background:
-                //     'radial-gradient(120% 100% at 50% 32%, #fbfbfc 0%, #eceef1 45%, #d6d9df 78%, #c3c7cf 100%)',
+                
+                background:
+                    'radial-gradient(68.02% 68.02% at 50% 50%, #E3E3E3 13.6%, #FFFFFF 100%)',
             }}
         >
             <WorkspaceHeader />

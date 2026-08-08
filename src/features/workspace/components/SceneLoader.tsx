@@ -1,18 +1,25 @@
 import { useProgress } from '@react-three/drei'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 const BARS = Array.from({ length: 12 })
 
 export function SceneLoader() {
     const { active } = useProgress()
     const [visible, setVisible] = useState(true)
+    const settled = useRef(false)
 
     useEffect(() => {
+        // Splash de chargement initial uniquement : on ignore les chargements lazy
+        // ultérieurs (aperçus/textures) pour ne pas re-flasher l'overlay.
+        if (settled.current) return
         if (active) {
             setVisible(true)
             return
         }
-        const timer = window.setTimeout(() => setVisible(false), 400)
+        const timer = window.setTimeout(() => {
+            settled.current = true
+            setVisible(false)
+        }, 400)
         return () => window.clearTimeout(timer)
     }, [active])
 
