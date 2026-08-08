@@ -3,6 +3,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 import Button from '../../../components/ui/button'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../components/ui/tooltip'
 import { useHelpStore } from '../model/helpStore'
 import { useViewportStore } from '../model/viewportStore'
 import { ShareDialog } from './ShareDialog'
@@ -25,6 +26,8 @@ export function WorkspaceHeader() {
     useEffect(() => {
         const audio = audioRef.current
         if (!audio) return
+
+        audio.volume = 0.8
 
         const play = () =>
             audio
@@ -72,45 +75,72 @@ export function WorkspaceHeader() {
                 <p className="text-sm text-neutral-700"><a href="https://github.com/massdx/space-3d-challenge" target="_blank" rel="noopener noreferrer" className="underline"> GitHub</a></p>
                 {/* <input placeholder='File name' value={"Test micro"} className="border text-xl border-none  focus-within:ring-2 ring-neutral-700 outline-none  text-neutral-900 px-3 font-medium  h-12 rounded-xl  py-1" /> */}
             </div>
-            <motion.div
-                className="space-x-2 "
-                initial="hidden"
-                animate="visible"
-                variants={{
-                    visible: { transition: { staggerChildren: 0.04, delayChildren: 0.1 } },
-                }}
-            >
-                <motion.span className="inline-block" variants={itemVariants} transition={itemTransition}>
-                    <Button onClick={toggleMusic}>
-                        <HugeiconsIcon icon={musicPlaying ? VolumeHighIcon : VolumeOffIcon} size={20} strokeWidth={1.8} />
-                    </Button>
-                </motion.span>
-                <motion.span className="inline-block" variants={itemVariants} transition={itemTransition}>
-                    <Button onClick={() => screenshot()}>
-                        <HugeiconsIcon icon={Camera01Icon} size={20} strokeWidth={1.8} />
-                    </Button>
-                </motion.span>
-                <motion.span className="inline-block" variants={itemVariants} transition={itemTransition}>
-                    <SettingsPopover>
-                        <Button>
-                            <HugeiconsIcon icon={Settings01Icon} size={20} strokeWidth={1.8} />
-                        </Button>
-                    </SettingsPopover>
-                </motion.span>
-                <motion.span className="inline-block" variants={itemVariants} transition={itemTransition}>
-                    <Button onClick={() => toggleHelp()}>
-                        <HugeiconsIcon icon={HelpCircleIcon} size={20} strokeWidth={1.8} />
-                    </Button>
-                </motion.span>
-                <motion.span className="inline-block" variants={itemVariants} transition={itemTransition}>
-                    <Button variant="black" onClick={() => setShareOpen(true)}>
-                        <HugeiconsIcon icon={LinkForwardIcon} size={20} className='' strokeWidth={1.8} />
-                        <span>
-                            Share or Export
-                        </span>
-                    </Button>
-                </motion.span>
-            </motion.div>
+            <TooltipProvider delayDuration={200}>
+                <motion.div
+                    className="space-x-2 "
+                    initial="hidden"
+                    animate="visible"
+                    variants={{
+                        visible: { transition: { staggerChildren: 0.04, delayChildren: 0.1 } },
+                    }}
+                >
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <motion.span className="inline-block" variants={itemVariants} transition={itemTransition}>
+                                <Button onClick={toggleMusic}>
+                                    <HugeiconsIcon icon={musicPlaying ? VolumeHighIcon : VolumeOffIcon} size={20} strokeWidth={1.8} />
+                                </Button>
+                            </motion.span>
+                        </TooltipTrigger>
+                        <TooltipContent>{musicPlaying ? 'Mute music' : 'Play music'}</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <motion.span className="inline-block" variants={itemVariants} transition={itemTransition}>
+                                <Button onClick={() => screenshot()}>
+                                    <HugeiconsIcon icon={Camera01Icon} size={20} strokeWidth={1.8} />
+                                </Button>
+                            </motion.span>
+                        </TooltipTrigger>
+                        <TooltipContent>Take a screenshot</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <motion.span className="inline-block" variants={itemVariants} transition={itemTransition}>
+                                <SettingsPopover>
+                                    <Button>
+                                        <HugeiconsIcon icon={Settings01Icon} size={20} strokeWidth={1.8} />
+                                    </Button>
+                                </SettingsPopover>
+                            </motion.span>
+                        </TooltipTrigger>
+                        <TooltipContent>Settings</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <motion.span className="inline-block" variants={itemVariants} transition={itemTransition}>
+                                <Button onClick={() => toggleHelp()}>
+                                    <HugeiconsIcon icon={HelpCircleIcon} size={20} strokeWidth={1.8} />
+                                </Button>
+                            </motion.span>
+                        </TooltipTrigger>
+                        <TooltipContent>Controls & help</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <motion.span className="inline-block" variants={itemVariants} transition={itemTransition}>
+                                <Button variant="black" onClick={() => setShareOpen(true)}>
+                                    <HugeiconsIcon icon={LinkForwardIcon} size={20} className='' strokeWidth={1.8} />
+                                    <span>
+                                        Share or Export
+                                    </span>
+                                </Button>
+                            </motion.span>
+                        </TooltipTrigger>
+                        <TooltipContent>Share or export your scene</TooltipContent>
+                    </Tooltip>
+                </motion.div>
+            </TooltipProvider>
             <ShareDialog open={shareOpen} onClose={() => setShareOpen(false)} />
         </div>
     )

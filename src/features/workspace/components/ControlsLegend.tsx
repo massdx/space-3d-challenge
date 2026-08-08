@@ -44,8 +44,8 @@ function RotateIcon() {
 
 const ROWS = [
     { label: 'Zoom camera', badge: [{ kind: 'icon', node: <MouseWheelIcon /> }] },
-    { label: 'Object Rotation', badge: [{ kind: 'icon', node: <MouseLeftIcon /> }, { kind: 'text', node: '+ R' }] },
-    { label: 'Object Scaling', badge: [{ kind: 'icon', node: <MouseLeftIcon /> }, { kind: 'text', node: '+ S' }] },
+    { label: 'Furniture Rotation', badge: [{ kind: 'text', node: 'R +' } , { kind: 'icon', node: <MouseLeftIcon /> }] },
+    { label: 'Furniture Scaling', badge: [{ kind: 'text', node: 'S +' } ,{ kind: 'icon', node: <MouseLeftIcon /> }  ] },
     { label: 'Camera movement', badge: [{ kind: 'icon', node: <MouseRightIcon /> }, { kind: 'icon', node: <RotateIcon /> }] },
     { label: 'Object Options', badge: [{ kind: 'text', node: 'Long' }, { kind: 'icon', node: <MouseLeftIcon /> }] },
 ] as const
